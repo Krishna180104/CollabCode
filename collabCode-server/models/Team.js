@@ -7,7 +7,8 @@ const teamSchema = new mongoose.Schema({
       user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
       role: { type: String, enum: ['Admin', 'Member','Owner'], default: 'Member' }
     }],
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+    username:{type:String}
 });
 
 export default mongoose.model("Team",teamSchema);
