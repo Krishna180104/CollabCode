@@ -1,5 +1,6 @@
 import Team from "../models/Team.js";
 import User from "../models/User.js";
+import Project from "../models/Project.js";
 
 export const createTeam = async (req, res) => {
     try {
@@ -94,4 +95,20 @@ export const joinTeam = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
 };
+
+export const getProjectsOfTeam = async(req,res) => {
+    try {
+        const {teamName} = req.body;
+        const team = await Team.findOne({name:teamName});
+        if(!team) return res.status(500).json({message:"Team with this username does not exist"});
+
+        const id = team._id;
+        const projects = await Project.find({team:id});
+        res.status(200).json({projects:projects});
+    } catch (error) {
+        res.status(500).json({error:error.message});
+    }
+}
+
+
   
