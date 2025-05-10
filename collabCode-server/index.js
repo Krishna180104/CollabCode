@@ -9,6 +9,7 @@ import authRoutes from "./routes/authRoutes.js";
 import teamRoutes from "./routes/teamRoutes.js"; 
 import projectRoutes from "./routes/projectRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 
 const app = express();
 app.use(cors());
@@ -18,6 +19,7 @@ app.use("/api/auth",authRoutes);
 app.use("/api/team",teamRoutes);
 app.use("/api/project",projectRoutes);
 app.use("/api/task",taskRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 await mongoose.connect(process.env.MONGO_URI).then(
     console.log("Mongo DB connected successfully")
