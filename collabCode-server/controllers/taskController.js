@@ -1,7 +1,6 @@
 import Task from "../models/Task.js";
-import Project from "../models/Project.js";
+import Notification from "../models/Notification.js";
 import mongoose from "mongoose";
-import {ObjectId} from "bson"
 
 // Create a task
 export const createTask = async (req, res) => {
@@ -18,6 +17,17 @@ export const createTask = async (req, res) => {
             createdBy: req.user.id
         });
 
+        // Notify the assigned user
+        if (assignedTo) {
+            await Notification.create({
+                recipient: assignedTo,
+                message: `You have been assigned a new task: ${title}`,
+                type: "task_assigned",
+                relatedTask: newTask._id
+            });
+        }
+
+
         res.status(201).json({ message: "Task created", task: newTask });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -29,7 +39,7 @@ export const getTasksByProject = async (req, res) => {
     try {
         const { projectId } = req.params;
         const id = mongoose.Types.ObjectId.createFromHexString(projectId);
-        console.log()
+
         const tasks = await Task.find({ project: id })
             .populate("assignedTo", "name email")
             .populate("createdBy", "name email");
@@ -44,10 +54,20 @@ export const getTasksByProject = async (req, res) => {
 export const updateTask = async (req, res) => {
     try {
         const { taskId } = req.params;
-        const {status} = req.body;
+        const updates = req.body;
 
         const task = await Task.findByIdAndUpdate(taskId, updates, { new: true });
         if (!task) return res.status(404).json({ message: "Task not found" });
+
+        // Notify the assigned user if status is updated
+        if (updates.status && task.assignedTo) {
+            await Notification.create({
+                recipient: task.assignedTo,
+                message: `Task "${task.title}" status updated to: ${updates.status}`,
+                type: "task_updated",
+                relatedTask: task._id
+            });
+        }
 
         res.json({ message: "Task updated", task });
     } catch (error) {
