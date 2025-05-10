@@ -30,6 +30,7 @@ export const createTask = async (req, res) => {
 
         res.status(201).json({ message: "Task created", task: newTask });
     } catch (error) {
+        console.log(error.message);
         res.status(500).json({ error: error.message });
     }
 };
